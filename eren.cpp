@@ -12,9 +12,14 @@ using namespace std;
 using namespace boost;
 
 
+void getCMO(vector< vector<string> >&, unsigned int&, string&, vector<float>&);
+void findBlock(vector< vector<string> >&, string&, unsigned int&, unsigned int&);
+
+
 int main(int argc, char* argv[]) {
 
   string kw ="CMO";
+  vector<float> ndaysSum={0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
 
   // Read data ------------------
   string fileName = argv[1];
@@ -50,17 +55,17 @@ int main(int argc, char* argv[]) {
   // end Read data --------------
 
 
-  unsigned int c0 = 0, c = 0;
+  unsigned int nn0 = 0, nn = 0;
   for(auto vec : dataIn) {
     if(vec[4].find(kw) != string::npos) {
-      c += 1;
+      nn += 1;
       //cout << vec[4] << endl;
     }
   }
 
-  c0 = c;
+  nn0 = nn;
 
-  cout << " Progress: " << setprecision(2) << float(c0-c)/float(c0) << "%" << endl;
+  cout << " Progress: " << setprecision(2) << float(nn0-nn)/float(nn0) << "%" << endl;
 
   string varID;
   unsigned int nPos = 0;                  // Position of varID
@@ -73,5 +78,71 @@ int main(int argc, char* argv[]) {
   }
 
 
+  getCMO(dataIn, nn, varID, ndaysSum);
+
   return 0;
 }
+
+
+
+void getCMO(vector< vector<string> >& dataIn, unsigned int& nn, string& varID, vector<float>& ndaySum) {
+
+  unsigned int kk = 0, erstellen = 0,
+               jj = 1, nn1 = 0, mm1 = 0;
+  //for( int ii=1;ii<=nn;ii++) {
+      
+  findBlock(dataIn, varID, nn1, mm1);
+   
+  //}
+
+}
+
+void findBlock(vector< vector<string> >& dataIn, string& varID, unsigned int& nn1, unsigned int& mm1) {
+
+  nn1 = 0;
+  while(true) {
+    if(dataIn[nn1][4] == varID) {
+      break;
+    }
+    nn1++;
+  }
+
+  mm1 = nn1+1;
+  while(true) {
+    if((dataIn[mm1][0] == "") && (dataIn[mm1][1] == "") && (dataIn[mm1][2] == "") && 
+       (dataIn[mm1][3] == "") && (dataIn[mm1][4] == "") && (dataIn[mm1][5] == "") && 
+       (dataIn[mm1][6] == "") && (dataIn[mm1][7] == "") && (dataIn[mm1][8] == "") && 
+       (dataIn[mm1][2] == "") && (dataIn[mm1][10] == "")) {
+      break;
+    }
+    mm1++;
+  }
+
+  cout << "nn1 = " << nn1 << ",\t" << "mm1 = " << mm1 << endl;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
