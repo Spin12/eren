@@ -100,8 +100,8 @@ inline void getCMO(vector< vector<string> >& dataIn, unsigned int& nn, string& v
                jj = 1, nn1 = 0, mm1 = 0;
   float year0, month0, day0, hour0, min0, sec0, time0;
   string user0;
-  vector<float> year(20,0), month(20,0), day(20,0), time(20,0);
-  vector<string> user(20,"NaN");
+  vector<float> year_k(20,0), month_k(20,0), day_k(20,0), time_k(20,0);
+  vector<string> user_k(20,"NaN");
   string sep1 = "", sep2 = "", sep3 = "";
   escaped_list_separator<char> sep;
 
@@ -152,21 +152,21 @@ inline void getCMO(vector< vector<string> >& dataIn, unsigned int& nn, string& v
     for(int jj = nn1; jj <= mm1; jj++) {
       
       if(dataIn[jj][3].find("erstellen") != string::npos) {
-        time[0] = time0;
-        year[0] = year0;
-        month[0] = month0;
-        day[0] = day0;
-        user[0] = user0;
+        time_k[0] = time0;
+        year_k[0] = year0;
+        month_k[0] = month0;
+        day_k[0] = day0;
+        user_k[0] = user0;
       }
   
       if((dataIn[jj][6].find("Utilisateur de validation") != string::npos) && (dataIn[jj][7] != "")) {
         kk++;
         cout << kk << endl;
-        time[kk] = time0;
-        year[kk] = year0;
-        month[kk] = month0;
-        day[kk] = day0;
-        user[kk] = user0;
+        time_k[kk] = time0;
+        year_k[kk] = year0;
+        month_k[kk] = month0;
+        day_k[kk] = day0;
+        user_k[kk] = user0;
       }
   
       for(int ll = 0; ll < dataIn[0].size();ll++){
