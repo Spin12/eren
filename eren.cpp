@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
 
   nn0 = nn;
 
-  cout << " Progress: " << setprecision(1) << float(nn0-nn)/float(nn0)*100 << "%";
+  cout << " Progress:  " << fixed << setprecision(2) << float(nn0-nn)/float(nn0)*100.0 << "%";
 
   string varID;
   unsigned int nPos;                  // Position of varID
@@ -83,7 +83,12 @@ int main(int argc, char* argv[]) {
     //varID="CMO - 2016 - 100696 - 0";
     getCMO(dataIn, nn, varID, ndaysSum);
   
-    //cout << "\b\b\b" <<  setprecision(1) << float(nn0-nn)/float(nn0)*100 << "%";
+    //cout << "\b\b\b\b\b\b" <<  setprecision(1) << float(nn0-nn)/float(nn0)*100 << "%";
+    if(float(nn0-nn)/float(nn0)*100.0<10) {
+      cout << "\b\b\b\b\b" <<  fixed << setprecision(2) << float(nn0-nn)/float(nn0)*100.0 << "%";
+    } else {
+      cout << "\b\b\b\b\b\b" <<  fixed << setprecision(2) << float(nn0-nn)/float(nn0)*100.0 << "%";
+    }
     //cout << setprecision(4) << float(nn) << endl;
     //cout << varID << endl;
   }
@@ -161,7 +166,6 @@ inline void getCMO(vector< vector<string> >& dataIn, unsigned int& nn, string& v
   
       if((dataIn[jj][6].find("Utilisateur de validation") != string::npos) && (dataIn[jj][7] != "")) {
         kk++;
-        cout << kk << endl;
         time_k[kk] = time0;
         year_k[kk] = year0;
         month_k[kk] = month0;
