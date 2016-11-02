@@ -65,110 +65,143 @@ int main(int argc, char* argv[]) {
 
   nn0 = nn;
 
-  cout << " Progress: " << setprecision(2) << float(nn0-nn)/float(nn0) << "%" << endl;
+  cout << " Progress: " << setprecision(1) << float(nn0-nn)/float(nn0)*100 << "%";
 
   string varID;
-  unsigned int nPos = 0;                  // Position of varID
-  for(auto vec : dataIn) {
-    if(vec[4].find(kw) != string::npos) {
-      varID = vec[4];
-      break;
+  unsigned int nPos;                  // Position of varID
+
+  while(nn != 0) {
+    for(auto vec : dataIn) {
+      if(vec[4].find(kw) != string::npos) {
+        varID = vec[4];
+        break;
+      }
+      nPos++;
     }
-    nPos++;
+  
+  
+    //varID="CMO - 2016 - 100696 - 0";
+    getCMO(dataIn, nn, varID, ndaysSum);
+  
+    //cout << "\b\b\b" <<  setprecision(1) << float(nn0-nn)/float(nn0)*100 << "%";
+    //cout << setprecision(4) << float(nn) << endl;
+    //cout << varID << endl;
   }
 
-
-  getCMO(dataIn, nn, varID, ndaysSum);
-
+  cout << endl << endl;
   return 0;
 }
 
 
 
-void getCMO(vector< vector<string> >& dataIn, unsigned int& nn, string& varID, vector<float>& ndaySum) {
+inline void getCMO(vector< vector<string> >& dataIn, unsigned int& nn, string& varID, vector<float>& ndaysSum) {
 
   unsigned int kk = 0, erstellen = 0,
                jj = 1, nn1 = 0, mm1 = 0;
-  //for( int ii=1;ii<=nn;ii++) {
-      
-  findBlock(dataIn, varID, nn1, mm1);
-  float year0, month0, day0, hour0, min0, sec0, tim0;
+  float year0, month0, day0, hour0, min0, sec0, time0;
   string user0;
+  vector<float> year(20,0), month(20,0), day(20,0), time(20,0);
+  vector<string> user(20,"NaN");
+  string sep1 = "", sep2 = "", sep3 = "";
+  escaped_list_separator<char> sep;
 
-  // Get date ------------------------------------------------------------
-  string sep1 = "", sep2 = "/", sep3 = "";
-  escaped_list_separator<char> sep(sep1,sep2,sep3);
-  tokenizer<escaped_list_separator<char> > tokDate( dataIn[nn1][0], sep );
-  day0 = stof(*(next(tokDate.begin(),0)));
-  month0 = stof(*(next(tokDate.begin(),1)));
-  year0 = stof(*(next(tokDate.begin(),2)));
+
+  for( int ii=0; ii<dataIn.size(); ii++) {
+      
+    findBlock(dataIn, varID, nn1, mm1);
+    if(nn1==0){
+      break;
+    }
+    nn--;
   
-  // Get time ------------------------------------------------------------
-  sep2 =":";
-  sep = {sep1,sep2,sep3};
-  tokenizer<escaped_list_separator<char> > tokTime( dataIn[nn1][1], sep );
-  hour0 = stof(*(next(tokTime.begin(),0)));
-  min0 = stof(*(next(tokTime.begin(),1)));
-  sec0 = stof(*(next(tokTime.begin(),2)));
+    // Get date ------------------------------------------------------------
+    {
+      sep2 = "/";
+      sep={sep1,sep2,sep3};
+      tokenizer<escaped_list_separator<char> > tokDate( dataIn[nn1][0], sep );
 
-  // Get time ------------------------------------------------------------
-  user0 = dataIn[nn1][2];
+      day0 = stof(*(next(tokDate.begin(),0)));
+      month0 = stof(*(next(tokDate.begin(),1)));
+      year0 = stof(*(next(tokDate.begin(),2)));
 
+    }
+    
+    // Get time ------------------------------------------------------------
+    {
+      sep2 =":";
+      sep = {sep1,sep2,sep3};
+      tokenizer<escaped_list_separator<char> > tokTime( dataIn[nn1][1], sep );
 
-  cout << day0 <<  "\t" << month0 <<  "\t" << setprecision(4) << year0 << endl;
-  cout << sec0 <<  "\t" << min0 <<  "\t" << hour0 << endl;
-  cout << user0 << endl;
+      hour0 = stof(*(next(tokTime.begin(),0)));
+      min0 = stof(*(next(tokTime.begin(),1)));
+      sec0 = stof(*(next(tokTime.begin(),2)));
+    }
   
+    // Get user ------------------------------------------------------------
+    user0 = dataIn[nn1][2];
   
+    // Calculate past time -------------------------------------------------
+    time0 = year0*365*24*60*60 +
+            ndaysSum[int(month0)]*24*60*60 +
+            day0*24*60*60 +
+            hour0*60*60 +
+            min0*60 + 
+            sec0;
+  
+    // Find "erstellen" and "Utilisateur de validation" -------------------
+    for(int jj = nn1; jj <= mm1; jj++) {
+      
+      if(dataIn[jj][3].find("erstellen") != string::npos) {
+        time[0] = time0;
+        year[0] = year0;
+        month[0] = month0;
+        day[0] = day0;
+        user[0] = user0;
+      }
+  
+      if((dataIn[jj][6].find("Utilisateur de validation") != string::npos) && (dataIn[jj][7] != "")) {
+        kk++;
+        cout << kk << endl;
+        time[kk] = time0;
+        year[kk] = year0;
+        month[kk] = month0;
+        day[kk] = day0;
+        user[kk] = user0;
+      }
+  
+      for(int ll = 0; ll < dataIn[0].size();ll++){
+        dataIn[jj][ll] = ""; 
+      }
+  
+    }
+  
+  }
 
 }
 
-void findBlock(vector< vector<string> >& dataIn, string& varID, unsigned int& nn1, unsigned int& mm1) {
+inline void findBlock(vector< vector<string> >& dataIn, string& varID, unsigned int& nn1, unsigned int& mm1) {
 
   nn1 = 0;
-  while(true) {
-    if(dataIn[nn1][4] == varID) {
+
+  for(unsigned int ii = mm1; ii < dataIn.size(); ii++) {
+    if(dataIn[ii][4] == varID) {
+      nn1 = ii;
       break;
     }
-    nn1++;
   }
 
-  mm1 = nn1+1;
-  while(true) {
-    if((dataIn[mm1][0] == "") && (dataIn[mm1][1] == "") && (dataIn[mm1][2] == "") && 
-       (dataIn[mm1][3] == "") && (dataIn[mm1][4] == "") && (dataIn[mm1][5] == "") && 
-       (dataIn[mm1][6] == "") && (dataIn[mm1][7] == "") && (dataIn[mm1][8] == "") && 
-       (dataIn[mm1][2] == "") && (dataIn[mm1][10] == "")) {
-      break;
+  if(nn1 != 0) {
+    mm1 = nn1+1;
+    while(true) {
+      if((dataIn[mm1][0] == "") && (dataIn[mm1][1] == "") && (dataIn[mm1][2] == "") && 
+         (dataIn[mm1][3] == "") && (dataIn[mm1][4] == "") && (dataIn[mm1][5] == "") && 
+         (dataIn[mm1][6] == "") && (dataIn[mm1][7] == "") && (dataIn[mm1][8] == "") && 
+         (dataIn[mm1][2] == "") && (dataIn[mm1][10] == "")) {
+        break;
+      }
+      mm1++;
     }
-    mm1++;
   }
-
-  cout << "nn1 = " << nn1 << ",\t" << "mm1 = " << mm1 << endl;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
