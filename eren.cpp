@@ -92,8 +92,34 @@ void getCMO(vector< vector<string> >& dataIn, unsigned int& nn, string& varID, v
   //for( int ii=1;ii<=nn;ii++) {
       
   findBlock(dataIn, varID, nn1, mm1);
-   
-  //}
+  float year0, month0, day0, hour0, min0, sec0, tim0;
+  string user0;
+
+  // Get date ------------------------------------------------------------
+  string sep1 = "", sep2 = "/", sep3 = "";
+  escaped_list_separator<char> sep(sep1,sep2,sep3);
+  tokenizer<escaped_list_separator<char> > tokDate( dataIn[nn1][0], sep );
+  day0 = stof(*(next(tokDate.begin(),0)));
+  month0 = stof(*(next(tokDate.begin(),1)));
+  year0 = stof(*(next(tokDate.begin(),2)));
+  
+  // Get time ------------------------------------------------------------
+  sep2 =":";
+  sep = {sep1,sep2,sep3};
+  tokenizer<escaped_list_separator<char> > tokTime( dataIn[nn1][1], sep );
+  hour0 = stof(*(next(tokTime.begin(),0)));
+  min0 = stof(*(next(tokTime.begin(),1)));
+  sec0 = stof(*(next(tokTime.begin(),2)));
+
+  // Get time ------------------------------------------------------------
+  user0 = dataIn[nn1][2];
+
+
+  cout << day0 <<  "\t" << month0 <<  "\t" << setprecision(4) << year0 << endl;
+  cout << sec0 <<  "\t" << min0 <<  "\t" << hour0 << endl;
+  cout << user0 << endl;
+  
+  
 
 }
 
