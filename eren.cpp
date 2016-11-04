@@ -22,7 +22,12 @@ int main(int argc, char* argv[]) {
 
 
   string kw ="CMO";
-  vector<double> ndaysSum={0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
+ 
+  cout << endl << " Bitte geben Sie das Schlüsselwort (z.B. CMO): "; 
+  cin >> kw;
+
+  vector<double> ndaysSum={0, 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366};
+  //vector<double> ndaysSum={0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
 
   // Define output file name ----
   ofstream fileOut("output.csv");
@@ -63,6 +68,7 @@ int main(int argc, char* argv[]) {
 
   // end Read data --------------
 
+  cout << endl << " Successfully read data!" << endl;
 
   unsigned int nn0 = 0, nn = 0;
   for(auto vec : dataIn) {
@@ -73,7 +79,8 @@ int main(int argc, char* argv[]) {
   }
 
   nn0 = nn;
-
+ 
+  cout << "\n\n";
   cout << " Progress:  " << fixed << setprecision(2) << double(nn0-nn)/double(nn0)*100.0 << "%";
 
   string varID;
@@ -115,13 +122,13 @@ int main(int argc, char* argv[]) {
 
 
 
-inline void getCMO(vector< vector<string> >& dataIn, unsigned int& nn, string& varID, vector<double>& ndaysSum,  ofstream& fileOut) {
+inline void getCMO(vector< vector<string> >& dataIn, unsigned int& nn, string& varID, vector<double>& ndaysSum, ofstream& fileOut) {
 
   unsigned int kk = 0, erstellen = 0, jj = 1, nn1 = 0, mm1 = 0;
   double year0, month0, day0, hour0, min0, sec0, time0;
   string user0;
-  vector<double> year_k(20,0), month_k(20,0), day_k(20,0), time_k(20,0);
-  vector<string> user_k(20,"NaN");
+  vector<double> year_k(100,0), month_k(100,0), day_k(100,0), time_k(100,0);
+  vector<string> user_k(100,"NaN");
   string sep1 = "", sep2 = "", sep3 = "";
   escaped_list_separator<char> sep;
 
@@ -137,14 +144,13 @@ inline void getCMO(vector< vector<string> >& dataIn, unsigned int& nn, string& v
   
     // Get date ------------------------------------------------------------
     {
-      sep2 = "/";
+      sep2 = "/.";
       sep={sep1,sep2,sep3};
       tokenizer<escaped_list_separator<char> > tokDate( dataIn[nn1][0], sep );
 
       day0 = stof(*(next(tokDate.begin(),0)));
       month0 = stof(*(next(tokDate.begin(),1)));
       year0 = stof(*(next(tokDate.begin(),2)));
-
     }
     
     // Get time ------------------------------------------------------------
@@ -172,7 +178,8 @@ inline void getCMO(vector< vector<string> >& dataIn, unsigned int& nn, string& v
     // Find "erstellen" and "Utilisateur de validation" -------------------
     for(int jj = nn1; jj <= mm1; jj++) {
       
-      if(dataIn[jj][3].find("erstellen") != string::npos) {
+      //if(dataIn[jj][3].find("erstellen") != string::npos) {
+      if(dataIn[jj][3].find("Création") != string::npos) {
         //cout << dataIn[jj][3] << "\t" << jj << "\t" << varID << endl;
         erstellen = 1;
         time_k[0] = time0;
@@ -185,16 +192,14 @@ inline void getCMO(vector< vector<string> >& dataIn, unsigned int& nn, string& v
       //if((dataIn[jj][6].find("Utilisateur de validation") != string::npos) && (dataIn[jj][7] != "")) {
       if((dataIn[jj][6].find("Utilisateur de validation") != string::npos) && (dataIn[jj][7].empty() != 1)) {
         kk++;
+        if(kk>98){
+          cout << "\n\n" << varID << "\t" << nn1 << "\t" << mm1 << endl;
+        }
         time_k[kk] = time0;
         year_k[kk] = year0;
         month_k[kk] = month0;
         day_k[kk] = day0;
         user_k[kk] = user0;
-/*
-        cout << endl << sec0 << "\t" << min0 << "\t" << hour0 << "\t" << day0 << "\t"
-                     << ndaysSum[int(month0)] << "\t" << year0 << "\t" << kk << "\t" <<  time_k[kk]
-                     << "\t" <<  time0;
-*/
       }
   
       for(int ll = 0; ll < dataIn[0].size();ll++){
@@ -204,6 +209,7 @@ inline void getCMO(vector< vector<string> >& dataIn, unsigned int& nn, string& v
     }
   
   }
+
   if(erstellen == 1) {
     writeData(year_k, month_k, day_k, time_k, user_k, kk, ndaysSum, varID, fileOut);
   }
@@ -226,7 +232,7 @@ inline void findBlock(vector< vector<string> >& dataIn, string& varID, unsigned 
       if((dataIn[mm1][0] == "") && (dataIn[mm1][1] == "") && (dataIn[mm1][2] == "") && 
          (dataIn[mm1][3] == "") && (dataIn[mm1][4] == "") && (dataIn[mm1][5] == "") && 
          (dataIn[mm1][6] == "") && (dataIn[mm1][7] == "") && (dataIn[mm1][8] == "") && 
-         (dataIn[mm1][9] == "") && (dataIn[mm1][10] == "")) {
+         (dataIn[mm1][9] == "") && (dataIn[mm1][9] == "")) {
         break;
       }
       mm1++;
@@ -274,8 +280,8 @@ inline void writeData(vector<double>& year_k, vector<double>& month_k, vector<do
   if(kk>1) {
     double timeMin=2016050413355900;
     int itMin = -1;
-    vector<double> yearSor(20,0), monthSor(20,0), daySor(20,0);
-    vector<string> userSor(20,"NaN");
+    vector<double> yearSor(kk+1,0), monthSor(kk+1,0), daySor(kk+1,0);
+    vector<string> userSor(kk+1,"NaN");
 
     for(int ii = 1;ii <= kk; ii++) {
       timeMin=2016050413355900;
@@ -297,14 +303,12 @@ inline void writeData(vector<double>& year_k, vector<double>& month_k, vector<do
    fileOut << varID << ";";
    fileOut << day_k[0] << "." << month_k[0] << "." << year_k[0] << ";" << user_k[0];
 
-   //int jj = 0;
-   vector<double> dt(20,0);
+   vector<double> dt(kk+1,0);
    for(int ii=1; ii<=kk; ii++) {
      if(ii==1) {
        dt[ii]= yearSor[1]*365 + ndaysSum[int(monthSor[1])] + daySor[1]
               -year_k[0]*365 - ndaysSum[int(month_k[0])] - day_k[0];
      } else {    
-       //jj = ii-1;
        dt[ii]=yearSor[ii]*365 + ndaysSum[int(monthSor[ii])] + daySor[ii]
              -yearSor[ii-1]*365 - ndaysSum[int(monthSor[ii-1])] - daySor[ii-1];
      }
@@ -317,25 +321,5 @@ inline void writeData(vector<double>& year_k, vector<double>& month_k, vector<do
 
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
